@@ -1,0 +1,18 @@
+{
+  "server": "irc.freenode.net",
+  "nick": "ChatReactor",
+  "userName": "ChatReactor",
+  "realName": "ChatReactor",
+  "port": 7000,
+  "secure": true,
+  "autoRejoin": true,
+  "autoConnect": true,
+  "messageSplit": 512,
+  "floodProtection": false,
+  "floodProtectionDelay": 250,
+  "channels": ["#hackreactor"],
+  "commandPrefix": "!",
+  "modules": ["command"],
+  "owners": ["n8n"],
+  "hooks": ["message", "message#", "pm"]
+}

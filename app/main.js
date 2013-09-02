@@ -1,29 +1,22 @@
-var irc = require('irc'),
+var _ = require('lodash'),
+    fs = require('fs'),
+    path = require('path'),
     winston = require('winston'),
-    createDispatcher = require('./dispatcher');
+    Bot = require('./bot');
 
-global.CHATREACTOR = require('./globals');
+winston.cli();
 
-global.LOGGER = new (winston.Logger)({
-  exitOnError: false,
-  transports: [new (winston.transports.Console)()]
+var bots, configs,
+    configPath = path.join(__dirname, 'config');
+
+configs = _.filter(fs.readdirSync(configPath), function(filename) {
+  return (/\.json$/i).test(filename);
 });
 
-var dispatcher = createDispatcher(CHATREACTOR.CHANNEL, new irc.Client(CHATREACTOR.SERVER, CHATREACTOR.USERNAME, {
-  channels: [CHATREACTOR.CHANNEL],
-  realName: 'Hack Reactor IRC Bot',
-  floodProtection: true,
-  floodProtectionDelay: 750
-}));
+bots = _.chain(configs).map(function(filename) {
+  var config = require(path.join(configPath, filename));
 
-dispatcher.addListener('message', function (from, message) {
-  dispatcher.dispatch('message', from, message);
-}, '#hackreactor');
+  winston.info('Creating bot with username', config.userName);
 
-dispatcher.addListener('join', function (nick, message) {
-  dispatcher.dispatch('join', nick, message);
-}, '#hackreactor');
-
-dispatcher.addListener('error', function (message) {
-  LOGGER.log('error', 'IRC Error: %j', message);
-});
+  return new Bot(config);
+}).compact().value();
